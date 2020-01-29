@@ -18,6 +18,8 @@ services:
       - ./scripts/update.sh:/docker-entrypoint-initdb.d/update.sh
     env_file:
       - ./scripts/env/production/db.env
+    healthcheck:
+      test: "exit 0"
 
   django:
     restart: unless-stopped
@@ -31,7 +33,8 @@ services:
         org.gis3w.component: django
         org.gis3w.instance.name: g3wsuite
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: python g3w-admin/manage.py runserver 0.0.0.0:8000
     #ports:
       #- 8000:8000
@@ -49,6 +52,9 @@ services:
     container_name: qgisserver4${COMPOSE_PROJECT_NAME}
     volumes_from:
       - django
+    depends_on:
+      db:
+        condition: service_healthy
 
   nginx:
     image: g3wsuite/nginx:uwsgi
@@ -65,7 +71,7 @@ services:
     depends_on:
       - django
     ports:
-      - 80:80
+      - 8200:80
 
 
 volumes:
