@@ -47,9 +47,13 @@ services:
 
   qgisserver:
     restart: unless-stopped
-    image: jancelin/qgis-server:2.18LTR
+    image: camptocamp/qgis-server:3.10
     #hostname: qgis-server
     container_name: qgisserver4${COMPOSE_PROJECT_NAME}
+    environment:
+      - QGIS_PROJECT_FILE=
+      - GIS_SERVER_LOG_LEVEL=DEBUG
+      - MAX_REQUESTS_PER_PROCESS=100
     volumes_from:
       - django
     depends_on:
